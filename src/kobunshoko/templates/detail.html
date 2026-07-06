@@ -1,0 +1,98 @@
+{% extends "layout.html" %}
+{% block title %}{{ doc.title or doc.tno }} — 公文書庫{% endblock %}
+{% block content %}
+
+<p><a href="/">← 一覧へ戻る</a></p>
+
+<h2>{{ doc.title or "（件名なし）" }}
+  {% if doc.pattern == "fallback" %}<span class="badge warn">形式未対応</span>{% endif %}
+</h2>
+
+<table class="meta-table">
+  <tr><th>到達番号</th><td class="mono">{{ doc.tno }}</td></tr>
+  <tr><th>受付日</th><td>{{ doc.received_date or "—" }}{% if doc.received_raw %}（{{ doc.received_raw }}）{% endif %}</td></tr>
+  <tr><th>発行機関</th><td>{{ doc.agency or "不明" }}</td></tr>
+  <tr><th>取込日時</th><td>{{ doc.ingested_at }}</td></tr>
+  <tr><th>形式パターン</th><td>{{ doc.pattern }}</td></tr>
+  <tr><th>改ざん検知</th>
+    <td>
+      {% if doc.verify_status == "ok" %}<span class="badge ok">改ざんなし</span>
+      {% elif doc.verify_status == "mismatch" %}<span class="badge error">不一致</span>
+      {% elif doc.verify_status == "unverifiable" %}<span class="badge warn">検証不能</span>
+      {% else %}<span class="badge">未検証</span>{% endif %}
+      <form method="post" action="/doc/{{ doc.tno }}/verify" class="verify-form">
+        <button type="submit">ダイジェスト照合を実行</button>
+      </form>
+    </td>
+  </tr>
+</table>
+
+<h3>タグ</h3>
+<div class="annotations">
+  <p class="tags-line">
+    {% for t in tags %}
+    <span class="badge tag">{{ t }}<form method="post" action="/doc/{{ doc.tno }}/tags/delete" class="inline-form"><input type="hidden" name="tag" value="{{ t }}"><button type="submit" class="tag-remove" title="タグを削除">×</button></form></span>
+    {% endfor %}
+    <form method="post" action="/doc/{{ doc.tno }}/tags" class="inline-form">
+      <input type="text" name="tag" placeholder="タグを追加" size="16" required>
+      <button type="submit">追加</button>
+    </form>
+  </p>
+</div>
+
+<h3>メモ</h3>
+<div class="annotations">
+  {% for m in memos %}
+  <div class="memo">
+    <div class="memo-body">{{ m.body }}</div>
+    <div class="memo-meta">
+      {{ m.created_at }}
+      <form method="post" action="/doc/{{ doc.tno }}/memos/{{ m.id }}/delete" class="inline-form">
+        <button type="submit">削除</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+  {% if not memos %}<p class="empty-note">メモはありません。</p>{% endif %}
+  <form method="post" action="/doc/{{ doc.tno }}/memos" class="memo-form">
+    <textarea name="body" rows="2" cols="60" placeholder="メモを追加（原本には書き込まれません）" required></textarea>
+    <div><button type="submit">メモを追加</button></div>
+  </form>
+</div>
+
+<h3>ファイル一覧</h3>
+<table class="doc-table">
+  <thead><tr><th>ファイル名</th><th>役割</th><th>サイズ</th><th>照合</th><th></th></tr></thead>
+  <tbody>
+    {% for f in files %}
+    <tr>
+      <td>
+        {% if f.viewable %}
+        <a href="/doc/{{ doc.tno }}/view/{{ f.name }}">{{ f.name }}</a>
+        {% else %}
+        {{ f.name }}
+        {% endif %}
+      </td>
+      <td><span class="badge">{{ f.role }}</span></td>
+      <td class="nowrap">{% if f.size is not none %}{{ "{:,}".format(f.size) }} B{% else %}—{% endif %}</td>
+      <td>
+        {% if f.digest_ok == 1 %}<span class="badge ok">一致</span>
+        {% elif f.digest_ok == 0 %}<span class="badge error">不一致</span>
+        {% else %}<span class="badge">—</span>{% endif %}
+      </td>
+      <td><a href="/doc/{{ doc.tno }}/raw/{{ f.name }}">原本</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if kagami_srcdoc %}
+<h3>鑑</h3>
+{% if kagami_fallback %}
+<p class="notice">XSLT変換に失敗したため簡易表示しています（{{ kagami_fallback }}）</p>
+{% endif %}
+<iframe class="doc-frame" sandbox="allow-popups allow-popups-to-escape-sandbox"
+        srcdoc="{{ kagami_srcdoc }}"></iframe>
+{% endif %}
+
+{% endblock %}

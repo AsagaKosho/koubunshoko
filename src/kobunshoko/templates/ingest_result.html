@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block title %}{{ heading or "取り込み結果" }} — 公文書庫{% endblock %}
+{% block content %}
+
+<p><a href="/">← 一覧へ戻る</a></p>
+<h2>{{ heading or "取り込み結果" }}</h2>
+
+{% if not results %}
+<p class="empty-note">対象がありませんでした。</p>
+{% endif %}
+<table class="doc-table">
+  <thead><tr><th>結果</th><th>取り込み元</th><th>到達番号</th><th>件名</th><th>詳細</th></tr></thead>
+  <tbody>
+    {% for r in results %}
+    <tr>
+      <td>
+        {% if r.status == "ok" %}<span class="badge ok">成功</span>
+        {% elif r.status == "skipped" %}<span class="badge warn">スキップ</span>
+        {% else %}<span class="badge error">失敗</span>{% endif %}
+      </td>
+      <td>{{ r.source }}</td>
+      <td class="mono">
+        {% if r.tno %}<a href="/doc/{{ r.tno }}">{{ r.tno }}</a>{% else %}—{% endif %}
+      </td>
+      <td>{{ r.title or "—" }}</td>
+      <td>{{ r.message }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

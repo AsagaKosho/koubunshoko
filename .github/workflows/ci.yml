@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Run tests
+        run: uv run pytest -q
+
+  data-leak-check:
+    # 実データ（実在の到達番号など）の混入防止。
+    # リポジトリ内の15桁以上の数字列は、合成データの規約どおり
+    # 2099 始まりでなければならない（実在の到達番号は年月日始まり）。
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for real-looking document numbers
+        run: |
+          leaks=$(git grep -hIoE '[0-9]{15,20}' -- ':!uv.lock' | grep -v '^2099' | sort -u || true)
+          if [ -n "$leaks" ]; then
+            echo "::error::実在の到達番号の可能性がある数字列が見つかりました（合成データは2099始まりの規約）:"
+            echo "$leaks"
+            git grep -nIE '[0-9]{15,20}' -- ':!uv.lock' | grep -vE '2099[0-9]{11,16}' || true
+            exit 1
+          fi
+          echo "OK: 長い数字列はすべて合成データ規約（2099始まり）に適合"

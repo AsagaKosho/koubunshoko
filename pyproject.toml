@@ -1,0 +1,50 @@
+[project]
+name = "kobunshoko"
+version = "0.1.0"
+description = "e-Gov 公文書アーカイブ「公文書庫」— XSLT廃止後もブラウザで公文書XMLを閲覧できるローカルWebアプリ / Local archive & viewer for Japanese e-Gov official documents (XML+XSLT)"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Kosho Asaga" }]
+requires-python = ">=3.12"
+keywords = ["e-gov", "egov", "公文書", "xslt", "archive", "japan"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Intended Audience :: End Users/Desktop",
+    "Natural Language :: Japanese",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business",
+]
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "jinja2>=3.1",
+    "lxml>=5.2",
+    "charset-normalizer>=3.3",
+    "python-multipart>=0.0.9",
+    "watchdog>=4",
+]
+
+[project.urls]
+Homepage = "https://github.com/AsagaKosho/kobunshoko"
+Issues = "https://github.com/AsagaKosho/kobunshoko/issues"
+
+[project.scripts]
+kobunshoko = "kobunshoko.main:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "httpx>=0.27",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/kobunshoko"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

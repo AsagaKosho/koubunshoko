@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="kagami.xsl" ?><DOC>
+    <FRONT>
+        <SECRECY>親展</SECRECY>
+        <STAMP>要</STAMP>
+    </FRONT>
+    <BODY ID="DOCBODY">
+        <STYLESHEET>kagami.xsl</STYLESHEET>
+        <DOCNO>209901010188888888</DOCNO>
+        <DATE>令和８年１月２２日</DATE>
+        <TO>
+            <NAME/>
+            <HONORIFC/>
+        </TO>
+        <AUTHOR>
+            <NAME>架空年金機構理事長</NAME>
+            <AFF>架空年金機構</AFF>
+        </AUTHOR>
+        <TITLE>架空年金機構からのお知らせ（合成テストデータ）</TITLE>
+        <MAINTXT>
+            <P>電子送付希望をいただいたテスト通知書を送付します。以下のファイルをご確認ください。</P>
+        </MAINTXT>
+        <APPENDIX>
+            <DOCLINK>テスト通知書_令和8年1月送付分(209901010188888888).xml</DOCLINK>
+            <APPTITLE>テスト通知書_令和8年1月送付分.xml</APPTITLE>
+        </APPENDIX>
+        <MAINTXT2>
+            <P>CSV形式のファイルを合わせて送付しますので、必要に応じてご活用ください。</P>
+        </MAINTXT2>
+        <APPENDIX2>
+            <DOCLINK>テスト通知書_令和8年1月送付分_明細(209901010188888888).csv</DOCLINK>
+            <APPTITLE>テスト通知書_令和8年1月送付分_明細.csv</APPTITLE>
+        </APPENDIX2>
+        <MAINTXT3>
+            <P/>
+        </MAINTXT3>
+    </BODY>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#" Id="test.example"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><Reference URI="#DOCBODY"><Transforms><Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><DigestValue>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</DigestValue></Reference><Reference URI="yoshiki_29_test_001.xsl"><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><DigestValue>ded1lUyTNDJ1lHtCT9lZXVE0gA8Jli6hMQCpGJNRatY=</DigestValue></Reference><Reference URI="テスト通知書_令和8年1月送付分_明細(209901010188888888).csv"><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><DigestValue>Ywv9M0xT6GyWNxEtHcRcPTbF31VIORS6IONzpqh6XVA=</DigestValue></Reference></SignedInfo><SignatureValue>c3ludGhldGljLXNpZ25hdHVyZS12YWx1ZQ==</SignatureValue><KeyInfo><X509Data><X509Certificate>c3ludGhldGljLWNlcnRpZmljYXRl</X509Certificate></X509Data></KeyInfo></Signature></DOC>

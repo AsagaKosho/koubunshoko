@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+dist/
+docs/04_受け入れ確認記録.md

@@ -1,0 +1,130 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<section class="ingest-box" id="dropzone">
+  <h2>取り込み</h2>
+  <form method="post" action="/ingest" enctype="multipart/form-data" id="upload-form">
+    <p>
+      e-Gov からダウンロードした公文書ZIPをここにドラッグ＆ドロップ、または
+      <input type="file" name="files" accept=".zip,application/zip" multiple required>
+      <button type="submit">取り込む</button>
+    </p>
+  </form>
+  <form method="post" action="/ingest/path" class="path-form">
+    <p>
+      解凍済みフォルダ／ZIPのパス:
+      <input type="text" name="path" placeholder="例: ~/Documents/209912312359591234" size="48" required>
+      <button type="submit">取り込む</button>
+    </p>
+  </form>
+  <form method="get" action="/scan" class="path-form">
+    <p>
+      過去分の一括取り込み — ディレクトリを走査:
+      <input type="text" name="dir" placeholder="例: ~/Documents" size="48" required>
+      <button type="submit">検出する</button>
+    </p>
+  </form>
+</section>
+
+<section>
+  <h2>文書一覧</h2>
+  <form method="get" action="/" class="filter-form">
+    <label>検索
+      <input type="search" name="q" value="{{ q }}" placeholder="件名・機関・本文" size="24">
+    </label>
+    <label>発行機関
+      <select name="agency">
+        <option value="">（すべて）</option>
+        {% for a in agencies %}
+        <option value="{{ a }}" {% if a == agency %}selected{% endif %}>{{ a }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>タグ
+      <select name="tag">
+        <option value="">（すべて）</option>
+        {% for t in tags %}
+        <option value="{{ t }}" {% if t == tag %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>年月
+      <select name="month">
+        <option value="">（すべて）</option>
+        {% for m in months %}
+        <option value="{{ m }}" {% if m == month %}selected{% endif %}>{{ m }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>並び順
+      <select name="sort">
+        <option value="received" {% if sort == "received" %}selected{% endif %}>受付日順</option>
+        <option value="ingested" {% if sort == "ingested" %}selected{% endif %}>取込日順</option>
+      </select>
+    </label>
+    <button type="submit">絞り込む</button>
+    <a href="/">クリア</a>
+  </form>
+
+  {% if documents %}
+  <table class="doc-table">
+    <thead>
+      <tr>
+        <th>受付日</th><th>発行機関</th><th>件名</th><th>到達番号</th><th>添付</th><th>取込日</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in documents %}
+      <tr>
+        <td class="nowrap">{{ d.received_date or d.received_raw or "—" }}</td>
+        <td>{{ d.agency or "不明" }}</td>
+        <td>
+          <a href="/doc/{{ d.tno }}">{{ d.title or "（件名なし）" }}</a>
+          {% if d.pattern == "fallback" %}<span class="badge warn">形式未対応</span>{% endif %}
+          {% for t in d.tags %}<a class="badge tag" href="/?tag={{ t | urlencode }}">{{ t }}</a>{% endfor %}
+        </td>
+        <td class="mono">{{ d.tno }}</td>
+        <td>
+          {% for k in d.kinds %}<span class="badge">{{ k }}</span>{% endfor %}
+        </td>
+        <td class="nowrap">{{ d.ingested_at[:10] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    {% if q %}
+  <p class="empty-note">「{{ q }}」に一致する文書はありません。</p>
+    {% else %}
+  <p class="empty-note">まだ文書がありません。上のフォームから公文書ZIPを取り込んでください。</p>
+    {% endif %}
+  {% endif %}
+</section>
+
+<section>
+  <form method="post" action="/reindex" class="reindex-form"
+        onsubmit="return confirm('カタログを全削除し、書庫の走査から再構築します。よろしいですか？');">
+    <button type="submit">再インデックス（カタログを書庫から再構築）</button>
+  </form>
+</section>
+
+<script>
+(function () {
+  var zone = document.getElementById("dropzone");
+  var form = document.getElementById("upload-form");
+  var input = form.querySelector('input[type="file"]');
+  ["dragenter", "dragover"].forEach(function (ev) {
+    zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.add("dragover"); });
+  });
+  ["dragleave", "drop"].forEach(function (ev) {
+    zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.remove("dragover"); });
+  });
+  zone.addEventListener("drop", function (e) {
+    if (e.dataTransfer && e.dataTransfer.files.length) {
+      input.files = e.dataTransfer.files;
+      form.submit();
+    }
+  });
+})();
+</script>
+{% endblock %}

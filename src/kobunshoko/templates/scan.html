@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block title %}過去分の一括取り込み — 公文書庫{% endblock %}
+{% block content %}
+
+<p><a href="/">← 一覧へ戻る</a></p>
+<h2>過去分の一括取り込み</h2>
+
+<form method="get" action="/scan" class="filter-form">
+  <label>走査するディレクトリ
+    <input type="text" name="dir" value="{{ dir }}" placeholder="例: ~/Documents" size="48" required>
+  </label>
+  <button type="submit">検出する</button>
+</form>
+
+{% if error %}
+<p class="notice">{{ error }}</p>
+{% elif dir %}
+  {% if candidates %}
+<p>公文書らしいZIP・フォルダを {{ candidates|length }} 件検出しました。取り込むものを確認して実行してください。</p>
+<form method="post" action="/ingest/bulk">
+  <table class="doc-table">
+    <thead><tr><th></th><th>種類</th><th>パス</th><th>到達番号（推定）</th><th>状態</th></tr></thead>
+    <tbody>
+      {% for c in candidates %}
+      <tr>
+        <td>
+          <input type="checkbox" name="paths" value="{{ c.path }}"
+                 {% if not c.ingested %}checked{% endif %}>
+        </td>
+        <td><span class="badge">{{ "ZIP" if c.kind == "zip" else "フォルダ" }}</span></td>
+        <td class="mono">{{ c.path }}</td>
+        <td class="mono">{{ c.tno or "—" }}</td>
+        <td>
+          {% if c.ingested %}<span class="badge warn">取り込み済み</span>
+          {% else %}<span class="badge ok">未取り込み</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p><button type="submit">チェックした項目を取り込む</button></p>
+</form>
+  {% else %}
+<p class="empty-note">公文書らしいZIP・フォルダは見つかりませんでした。</p>
+  {% endif %}
+{% endif %}
+
+{% endblock %}

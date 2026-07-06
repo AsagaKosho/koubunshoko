@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><?xml-stylesheet type="text/xsl" href="yoshiki_29_test_001.xsl" ?>
+<TestTsuchiShoList>
+    <testTsuchiSho>
+        <hakkouYmd>令和8年1月22日</hakkouYmd>
+        <jigyoshoSeiriKigo>99ﾃｽﾄ</jigyoshoSeiriKigo>
+        <jigyoshoNum>07777</jigyoshoNum>
+        <jigyoshoName>株式会社　テスト商事</jigyoshoName>
+        <goukeigaku>76,543</goukeigaku>
+        <oshirase>テスト通知です。&lt;br/&gt;詳細はダミーです。&lt;a href="https://example.invalid/"&gt;https://example.invalid/&lt;/a&gt;</oshirase>
+    </testTsuchiSho>
+</TestTsuchiShoList>

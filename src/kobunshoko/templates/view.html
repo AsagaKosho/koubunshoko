@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block title %}{{ file_name }} — 公文書庫{% endblock %}
+{% block content %}
+
+<p>
+  <a href="/doc/{{ tno }}">← 文書セット {{ tno }} へ戻る</a>
+  ｜ <a href="{{ raw_url }}">原本をダウンロード</a>
+  {% if kind == "html" %}
+  ｜ <a href="/doc/{{ tno }}/print/{{ file_name }}" target="_blank">印刷 / PDF保存</a>
+  {% endif %}
+</p>
+<h2>{{ file_name }}</h2>
+
+{% if fallback_reason %}
+<p class="notice">XSLT変換に失敗したため簡易表示しています（{{ fallback_reason }}）</p>
+{% endif %}
+
+{% if kind == "html" %}
+<iframe class="doc-frame tall" sandbox="allow-popups allow-popups-to-escape-sandbox"
+        srcdoc="{{ srcdoc }}"></iframe>
+
+{% elif kind == "csv" %}
+{% if rows %}
+<div class="table-scroll">
+<table class="csv-table">
+  {% for row in rows %}
+  <tr>
+    {% for cell in row %}
+    <td>{{ cell }}</td>
+    {% endfor %}
+  </tr>
+  {% endfor %}
+</table>
+</div>
+{% else %}
+<p class="empty-note">CSVは空です。</p>
+{% endif %}
+
+{% elif kind == "pdf" %}
+<iframe class="doc-frame tall" src="{{ raw_url }}"></iframe>
+
+{% elif kind == "dta" %}
+{% if dta_lines %}
+<h3>読み取り可能なレコード（事業所情報など）</h3>
+<pre class="dta-text">{% for line in dta_lines %}{{ line }}
+{% endfor %}</pre>
+{% endif %}
+{% if dta_encrypted_bytes %}
+<p class="notice">
+  残りの {{ "{:,}".format(dta_encrypted_bytes) }} バイトは暗号化された被保険者データのため、ここではプレビューできません。
+  日本年金機構の<a href="https://www.nenkin.go.jp/denshibenri/program/download.html"
+  target="_blank" rel="noopener">届書作成プログラム</a>の「データの取り込み」で読み込んで確認してください
+  （読み込みパスワードは事業所番号5桁。5桁未満は先頭を0で埋め、事業所所在地の都道府県も指定します）。
+</p>
+{% elif not dta_lines %}
+<p class="notice">このDTAファイルには読み取り可能なテキストが含まれていません。<a href="{{ raw_url }}">原本をダウンロード</a>し、届書作成プログラムで取り込んでください。</p>
+{% endif %}
+
+{% elif kind == "undecodable" %}
+<p class="notice">文字コードを判定できませんでした。<a href="{{ raw_url }}">原本をダウンロード</a>してご確認ください。</p>
+{% endif %}
+
+{% endblock %}
